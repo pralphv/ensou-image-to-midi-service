@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.background import BackgroundTasks
 from fastapi import FastAPI, File, UploadFile, Response, responses
+from mangum import Mangum
 
 from processing import convert_image_to_midi, load_image
 
@@ -47,3 +48,6 @@ async def run_convert_image_to_midi(
         midi.writeFile(f)
         background_tasks.add_task(remove_file, f.name)
         return responses.FileResponse(f.name, media_type="audio/mid")
+
+
+handler = Mangum(app=app)
