@@ -1,27 +1,30 @@
-from skimage.transform import resize
+from typing import Union, IO
+
 from midiutil.MidiFile import MIDIFile
-from skimage import io
+from PIL import Image, ImageOps
 import numpy as np
 
 from processing import constants, types
 
 
-def convert_image_to_midi(image: np.ndarray) -> MIDIFile:
+def convert_image_to_midi(image: Image.Image) -> MIDIFile:
     image = rescale(image)
+    image = np.asarray(image)  # Image is actually numpy
     note_events = image_to_notes(image)
     midi = create_midi_file(note_events)
     return midi
 
 
-def load_image(file_name: str) -> np.ndarray:
-    image: np.ndarray = io.imread(file_name, as_gray=True)
-    return image
+def load_image(file: IO) -> Image.Image:
+    img = Image.open(file)
+    img = ImageOps.grayscale(img)
+    return img
 
 
-def rescale(image: np.ndarray) -> np.ndarray:
-    height, width = image.shape
-    width_ratio = height / (width / constants.NO_PIANO_KEYS)
-    image = resize(image, (int(width_ratio), constants.NO_PIANO_KEYS))
+def rescale(image: Image.Image) -> Image.Image:
+    width, height = image.size
+    height = height / (width / constants.NO_PIANO_KEYS)
+    image = image.resize((88, int(height)))
     return image
 
 
@@ -29,7 +32,7 @@ def image_to_notes(image: np.ndarray) -> list[types.NoteEventType]:
     height, width = image.shape
     note_events: list[types.NoteEventType] = []
     for i in range(width):
-        note_on: None | int = None
+        note_on: Union[None, int] = None
         note_started: bool = False
         for j in range(height):
             x = i
@@ -73,19 +76,3 @@ def create_midi_file(note_events: list[types.NoteEventType]) -> MIDIFile:
             volume
         )
     return mf
-
-
-def main():
-    file_name = 'ltypBIXdmfZAGGC-800x450-noPad.jpg'
-
-    image = load_image(file_name)
-    midi = convert_image_to_midi(image)
-
-    # write it to disk
-    save_file_name = ''.join(file_name.split('.')[:-1])
-    with open(f'{save_file_name}.mid', 'wb') as f:
-        midi.writeFile(f)
-
-
-if __name__ == '__main__':
-    main()
