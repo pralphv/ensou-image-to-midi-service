@@ -1,1 +1,0 @@
-NO_PIANO_KEYS: int = 88
