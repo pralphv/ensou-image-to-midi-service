@@ -1,4 +1,5 @@
-from typing import Union, IO, List
+from io import BytesIO
+from typing import Union, List
 
 from midiutil.MidiFile import MIDIFile
 from PIL import Image, ImageOps
@@ -15,7 +16,7 @@ def convert_image_to_midi(image: Image.Image) -> MIDIFile:
     return midi
 
 
-def load_image(file: IO) -> Image.Image:
+def load_image(file: BytesIO) -> Image.Image:
     img = Image.open(file)
     img = ImageOps.grayscale(img)
     return img
@@ -38,7 +39,6 @@ def image_to_notes(image: np.ndarray) -> List[types.NoteEventType]:
             x = i
             y = height - j - 1
             current_pixel = image[y][x]
-            # print(current_pixel, x, y)
             if not note_started and current_pixel <= 0.7:
                 note_started = True
                 note_on = j
@@ -65,7 +65,6 @@ def create_midi_file(note_events: List[types.NoteEventType]) -> MIDIFile:
     volume = 100
 
     note_events = sorted(note_events, key=lambda k: k.note_on)
-    # print(note_events)
     for note_event in note_events:
         mf.addNote(
             track,
