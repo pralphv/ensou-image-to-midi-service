@@ -18,8 +18,7 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'headers': {
             'Access-Control-Allow-Headers': 'Content-Type',
-            # 'Access-Control-Allow-Origin': 'https://ensou-d031f.web.app/',
-            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Origin': 'http://ensoumidi.com/',
             'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
         },
         'body': json.dumps({'midi_file': encoded_string})
