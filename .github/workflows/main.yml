@@ -15,12 +15,6 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  test:
-     name: Build
-     runs-on: ubuntu-latest
-     steps:
-     - run: | 
-        echo ${{secrets.AWS_ACCESS_KEY_ID}}
   build-and-push:
     runs-on: ubuntu-latest
     steps:
@@ -33,3 +27,6 @@ jobs:
         repo: ensou-image-to-midi
         region: us-east-2
         tags: latest,${{ github.sha }}
+        create_repo: true
+        set_repo_policy: true
+        repo_policy_file: repo-policy.json
